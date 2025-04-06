@@ -1,0 +1,171 @@
+﻿@model IEnumerable<Product>
+@using WebApplication4.ViewModels
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<!-- Swiper.js CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<link href="~/css/alert.css" rel="stylesheet" />
+<link href="~/css/home.css" rel="stylesheet" />
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning mt-5 text-center">
+        <h4 class="alert-heading">No Products Available!</h4>
+        <p class="mb-0">There are no products currently available. Please check back later.</p>
+    </div>
+}
+else
+{
+    <!-- Banner Section -->
+    <div class="banner-container">
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide banner-slide">
+                    <img src="~/asset/images/asus.jpg" alt="Ad 1">
+                </div>
+                <div class="swiper-slide banner-slide">
+                    <img src="~/asset/images/banner2.png" alt="Ad 2">
+                </div>
+                <div class="swiper-slide banner-slide">
+                    <img src="~/asset/images/HP-Banner.webp" alt="Ad 3">
+                </div>
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    <!-- 🔹 Products Grid -->
+    <div class="container mt-5">
+        <h2 class="text-center text-primary mb-4">Products</h2>
+        <div class="row">
+            @foreach (var product in Model)
+            {
+                <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                    <div class="card h-100 shadow-lg border-0 rounded-4 overflow-hidden position-relative">
+                        <a href="@Url.Action("Details", "Product", new { id = product.Id })">
+                            <img src="@Url.Content($"~/asset/images/{product.Cover}")"
+                                 class="card-img-top img-fluid"
+                                 alt="@product.ProductName"
+                                 style="height: 200px; object-fit: contain;">
+                        </a>
+
+                        @if (product.StockQuantity == 0)
+                        {
+                            <span class="badge bg-danger position-absolute top-0 end-0 m-2 px-3 py-2">Out of Stock</span>
+                        }
+
+                        <div class="card-body">
+                            <span class="badge bg-secondary fs-6">@product.Brand.Name</span>
+                            <h5 class="card-title fw-bold text-dark">@product.ProductName</h5>
+                            <p class="card-text text-muted">@product.Description</p>
+                            <p class="fw-bold @(product.StockQuantity > 0 ? "text-success" : "text-danger")">
+                                @(product.StockQuantity > 0 ? $"In Stock: {product.StockQuantity}" : "Out of Stock")
+                            </p>
+                        </div>
+
+                        <div class="card-footer bg-light d-flex justify-content-between align-items-center border-0">
+                            <h5 class="mb-0 text-primary fw-bold">@product.Price <small>EGP</small></h5>
+                            <form asp-controller="ShoppingCart" id="addto_cart" asp-action="AddOrder" method="post" class="d-inline">
+                                <input type="hidden" name="productId" value="@product.Id" />
+                                <input type="hidden" name="stock" value="@product.StockQuantity" />
+                                <button type="submit" class="btn btn-success btn-sm rounded-pill px-3 py-2">
+                                    <i class="bi bi-cart-plus add-to-cart-btn"></i> Add to Cart
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+
+    <!-- Trending Products -->
+    <section class="trending-section">
+        <div class="container">
+            <h2 class="text-center text-success mb-4">Trending Products</h2>
+            <div class="swiper mySwiper">
+                <div class="swiper-wrapper">
+                    @foreach (var product in Model)
+                    {
+                        <div class="swiper-slide">
+                            <div class="card trending-card rounded-4 h-100">
+                                <img src="@Url.Content($"~/asset/images/{product.Cover}")"
+                                     class="trending-image"
+                                     alt="@product.ProductName">
+                                <div class="card-body text-center">
+                                    <h5 class="fw-bold text-dark">@product.ProductName</h5>
+                                    <p class="text-danger fw-bold mb-3">EGP @product.Price</p>
+                                    <a href="@Url.Action("Details", "Product", new { id = product.Id })" 
+                                       class="btn btn-primary btn-sm rounded-pill w-100">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+        </div>
+    </section>
+}
+
+@section Scripts {
+    <script src="~/js/details.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/addtocart.js"></script>
+    <script src="~/js/cartitem.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Banner slider
+            new Swiper(".swiper-container", {
+                loop: true,
+                autoplay: {
+                    delay: 3000,
+                    disableOnInteraction: false,
+                },
+                pagination: {
+                    el: ".swiper-pagination",
+                    clickable: true,
+                },
+                effect: "fade",
+                fadeEffect: {
+                    crossFade: true
+                }
+            });
+
+            // Trending products slider
+            new Swiper(".mySwiper", {
+                slidesPerView: 1,
+                spaceBetween: 20,
+                loop: true,
+                autoplay: {
+                    delay: 3000,
+                    disableOnInteraction: false,
+                },
+                pagination: {
+                    el: ".swiper-pagination",
+                    clickable: true,
+                },
+                navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                },
+                breakpoints: {
+                    576: { slidesPerView: 2 },
+                    992: { slidesPerView: 3 },
+                    1200: { slidesPerView: 4 }
+                }
+            });
+        });
+    </script>
+    }

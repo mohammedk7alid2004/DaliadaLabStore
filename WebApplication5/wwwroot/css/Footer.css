@@ -1,0 +1,29 @@
+﻿.carousel-control-prev,
+.carousel-control-next {
+    width: 5%; /* Adjust the width */
+    opacity: 1; /* Make arrows more visible */
+}
+
+.carousel-control-prev {
+    left: -40px; /* Move arrow outside the card */
+}
+
+.carousel-control-next {
+    right: -40px; /* Move arrow outside the card */
+}
+
+.carousel-item {
+    text-align: center; /* Center content properly */
+    padding: 10px; /* Adjust spacing */
+}
+/* Ensure space between Trending Products and Footer */
+.trending-products-container {
+    margin-bottom: 80px; /* Increase spacing */
+}
+
+/* If the footer is overlapping, ensure it stays at the bottom */
+footer {
+    position: relative;
+    width: 100%;
+    bottom: 0;
+}

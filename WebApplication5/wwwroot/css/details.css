@@ -1,0 +1,19 @@
+﻿.container {
+    width: 80%;
+    margin: auto;
+}
+
+.swiper-slide {
+    text-align: center;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+    .swiper-slide img {
+        width: 100%;
+        height: auto;
+        max-height: 200px;
+        object-fit: cover;
+    }

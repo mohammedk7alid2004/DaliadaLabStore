@@ -1,0 +1,48 @@
+﻿@using WebApplication4.ViewModels
+@model List<RolesViewModel>
+
+
+<link href="~/css/indexrole.css" rel="stylesheet" />
+<p>
+	<a asp-action="AddRole">Create New Role</a>
+</p>
+<style>
+	.role-link {
+		color: #3498db;
+		text-decoration: none;
+		transition: all 0.3s;
+	}
+
+		.role-link:hover {
+			color: #2980b9;
+			text-decoration: underline;
+		}
+
+	.action-buttons {
+		display: flex;
+		justify-content: flex-end;
+	}
+</style>
+<table class="table">
+	<thead>
+		<tr>
+			<th>
+				Role Name
+			</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<td>
+					@item.Name
+				</td>
+				<td>
+					<a href="@Url.Action("DeleteRole","Role",new {rolename=@item.Name})">Delete</a>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>

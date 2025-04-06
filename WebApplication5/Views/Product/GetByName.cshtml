@@ -1,0 +1,37 @@
+﻿@model IEnumerable<Product>
+@if (Model != null && Model.Any())
+{
+    <div class="row mt-5">
+        @foreach (var product in Model)
+        {
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                <a class="card h-100 shadow-sm text-decoration-none rounded-3 overflow-hidden"
+                   asp-controller="Product" asp-action="Details" asp-route-id="@product.Id">
+
+                    <img src="@($"/asset/images/{product.Cover}")" class="card-img-top"
+                         alt="@product.ProductName" style="height: 250px; object-fit: cover;">
+
+                    <div class="card-body">
+                        <span class="badge bg-secondary fs-6">@(product.Brand?.Name ?? "Unknown Brand")</span>
+                        <h5 class="card-title">@product.ProductName</h5>
+                        <p class="card-text text-muted">@(product.Description ?? "No description available")</p>
+                    </div>
+
+                    <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 text-primary">@product.Price <small>EGP</small></h5>
+                        <button class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-cart-plus"></i> Add to Cart
+                        </button>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-warning mt-5">
+        <h4 class="alert-heading">No Product found!</h4>
+        <p class="mb-0">No products found with the given name.</p>
+    </div>
+}

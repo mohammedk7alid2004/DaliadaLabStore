@@ -1,0 +1,15 @@
+﻿.role-link {
+    color: #3498db;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+    .role-link:hover {
+        color: #2980b9;
+        text-decoration: underline;
+    }
+
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+}

@@ -1,0 +1,141 @@
+﻿@model IEnumerable<ShoppingCart>
+
+@{
+    ViewData["Title"] = "Shopping Cart";
+}
+<link href="~/css/alert.css" rel="stylesheet" />
+<h1 class="text-center my-4 text-success fw-bold">🛒 Shopping Cart</h1>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="~/js/addtocart.js"></script>
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-warning text-center">
+        <h4>🚨 No products in your cart!</h4>
+        <p>Start shopping now and add items to your cart.</p>
+        <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Shop Now</a>
+    </div>
+}
+else
+{
+    <div class="container">
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card shadow-sm border-0 rounded-4">
+                        <img src="@Url.Content($"~/asset/images/{item.Product?.Cover}")"
+                             class="card-img-top img-fluid p-3 rounded-4"
+                             alt="@item.Product?.ProductName"
+                             style="height: 180px; object-fit: contain;">
+
+                        <div class="card-body">
+                            <h5 class="fw-bold text-success">@item.Product?.ProductName</h5>
+                            <span class="badge bg-info fs-6">@item.Product?.Brand?.Name</span>
+
+                            <h6 class="mt-2 text-danger">
+                                Price: Egp <span id="price-@item.Product?.Id">@Convert.ToInt32(Convert.ToDecimal(item.Product?.Price) * item.Quantity)</span>
+                            </h6>
+
+                            <!-- Stock Availability -->
+                            <p class="text-muted small">Stock: <span class="fw-bold">@item.Product?.StockQuantity</span></p>
+
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <!-- Quantity Update -->
+                                <form asp-controller="ShoppingCart" asp-action="UpdateQuantity" method="post" class="d-flex align-items-center">
+                                    <input type="hidden" name="productId" value="@item.Product?.Id" />
+
+                                    <button type="button" class="btn btn-outline-secondary btn-sm update-quantity"
+                                            data-product-id="@item.Product?.Id" data-change="-1">
+                                        ➖
+                                    </button>
+
+                                    <span id="quantity-@item.Product?.Id" class="mx-2 fs-5 fw-bold">@item.Quantity</span>
+
+                                    <button type="button" class="btn btn-outline-primary btn-sm update-quantity"
+                                            data-product-id="@item.Product?.Id" data-change="1"
+                                            data-stock="@item.Product?.StockQuantity">
+                                        ➕
+                                    </button>
+                                </form>
+
+                                <!-- Remove Item -->
+                                <form asp-controller="ShoppingCart" id="remove_from_cart" asp-action="Remove" method="post">
+                                    <input type="hidden" name="productId" value="@item.Product?.Id" />
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-trash"></i> Remove
+                                    </button>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Order Total -->
+        <div class="text-end mt-4">
+            <h4 class="fw-bold">
+                Total: <span class="text-danger" id="total-price">
+                    Egp @Convert.ToInt32(Model.Sum(i => Convert.ToDecimal(i.Product?.Price) * i.Quantity))
+                </span>
+            </h4>
+
+            <!-- Payment Methods -->
+            <div class="d-flex gap-3 justify-content-end mt-3">
+                <span class="fw-bold">Payment Methods:</span>
+                <i class="fa-brands fa-paypal"></i>  <!-- PayPal -->
+                <i class="fa-brands fa-cc-visa"></i>  <!-- Visa -->
+                <i class="fa-solid fa-money-bill-wave"></i>  <!-- Vodafone Cash Alternative -->
+             
+            </div>
+
+            <!-- Checkout and Complete Payment Buttons -->
+            <div class="d-flex gap-3 justify-content-end mt-3">
+                <a href="@Url.Action("Checkout", "ShoppingCart")" class="btn btn-success btn-lg">
+                    <i class="bi bi-credit-card"></i> Checkout
+                </a>
+                <form action="@Url.Action("AddOrder", "Order")" method="post">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-wallet2"></i> Make Order
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+	<script src="~/js/removecart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".update-quantity").forEach(button => {
+                button.addEventListener("click", function () {
+                    let productId = this.getAttribute("data-product-id");
+                    let change = parseInt(this.getAttribute("data-change"));
+                    let stock = parseInt(this.getAttribute("data-stock"));
+
+                    let quantitySpan = document.getElementById(`quantity-${productId}`);
+                    let priceSpan = document.getElementById(`price-${productId}`);
+                    let totalPriceSpan = document.getElementById("total-price");
+
+                    let currentQuantity = parseInt(quantitySpan.innerText);
+                    let pricePerItem = parseInt(priceSpan.innerText) / currentQuantity;
+
+                    let newQuantity = currentQuantity + change;
+                    if (newQuantity < 1) newQuantity = 1; // Prevent quantity from being less than 1
+                    if (newQuantity > stock) newQuantity = stock; // Prevent exceeding stock
+
+                    quantitySpan.innerText = newQuantity;
+                    priceSpan.innerText = pricePerItem * newQuantity;
+
+                    let totalPrice = Array.from(document.querySelectorAll("[id^='price-']"))
+                        .reduce((sum, priceEl) => sum + parseInt(priceEl.innerText), 0);
+                    totalPriceSpan.innerText = `Egp ${totalPrice}`;
+                });
+            });
+        });
+    </script>
+}
